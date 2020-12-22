@@ -1,0 +1,27 @@
+import discord, json, asyncio, typing
+import matplotlib.pyplot as plt
+from discord.ext import tasks, commands
+from random import randint
+
+with open("./data/userdatabase.json", "r", encoding='UTF8') as db_json: userdb = json.load(db_json)
+
+figure_num = 0
+
+def get_embed(title, description='', color=0xCCFFFF): 
+    return discord.Embed(title=title,description=description,color=color)
+
+class stockcog(commands.Cog):
+    def __init__(self, client):
+        self.client = client    
+
+    @commands.command(name='차트', aliases=['차','주식','그래프','그'])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def stock_chart(self, ctx):
+        with open("./data/stock.json", "r", encoding='UTF8') as db_json: stdb = json.load(db_json)
+        await ctx.send(stdb["알티전자"])
+        plt.plot(stdb["알티전자"])
+        plt.savefig("chart.png")
+        await ctx.send(file=discord.File("chart.png"))
+
+def setup(client):
+    client.add_cog(stockcog(client))
